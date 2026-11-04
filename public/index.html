@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusPulse — Next-Gen Smart University OS</title>
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Canvas Confetti for Celebration on Payment -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            dark: {
+              900: '#0b0f19',
+              800: '#111827',
+              700: '#1f2937',
+              card: 'rgba(17, 24, 39, 0.75)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#0a0e17] text-slate-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white flex overflow-x-hidden">
+
+  <!-- Background Ambient Glow -->
+  <div class="fixed top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[45rem] h-[45rem] bg-cyan-600/15 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+  <div class="fixed top-[40%] right-[20%] w-[30rem] h-[30rem] bg-purple-600/10 rounded-full blur-[130px] pointer-events-none -z-10"></div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="w-64 border-r border-slate-800/80 bg-slate-900/60 backdrop-blur-xl flex flex-col justify-between fixed top-0 bottom-0 z-40 transition-all duration-300" id="sidebar">
+    <div>
+      <!-- Brand Logo -->
+      <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h1 class="font-display font-bold text-lg text-white tracking-tight flex items-center gap-1.5">
+              CampusPulse
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">AI</span>
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">Smart University OS</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-3 space-y-1 text-sm font-medium">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('attendance')" id="nav-attendance" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="check-check" class="w-4 h-4"></i>
+          <span>Attendance & Bunks</span>
+          <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold">84.6%</span>
+        </button>
+        <button onclick="switchTab('map')" id="nav-map" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+          <span>Campus Map & Blocks</span>
+        </button>
+        <button onclick="switchTab('timetable')" id="nav-timetable" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+          <span>Timetable & Classes</span>
+          <span class="ml-auto w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+        </button>
+        <button onclick="switchTab('mess')" id="nav-mess" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="utensils" class="w-4 h-4"></i>
+          <span>Mess Menu & Reviews</span>
+        </button>
+        <button onclick="switchTab('fees')" id="nav-fees" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="credit-card" class="w-4 h-4"></i>
+          <span>Fee Payments</span>
+          <span id="nav-fee-badge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-semibold">Due</span>
+        </button>
+        <button onclick="switchTab('copilot')" id="nav-copilot" class="nav-btn flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+          <span>Campus AI Copilot</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Student Quick Info Box -->
+    <div class="p-4 border-t border-slate-800/80 bg-slate-900/40">
+      <div class="flex items-center gap-3">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-10 h-10 rounded-full border border-indigo-500/40 object-cover">
+        <div class="overflow-hidden">
+          <h4 class="text-xs font-bold text-white truncate">Aryan Sharma</h4>
+          <p class="text-[11px] text-slate-400 truncate">Roll: 23BCSE1042</p>
+          <p class="text-[10px] text-indigo-400 font-medium">B-312, Mandovi Hostel</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="ml-64 flex-1 flex flex-col min-h-screen">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-16 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-xl px-8 flex items-center justify-between sticky top-0 z-30">
+      <!-- Search & Realtime Clock -->
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3.5 py-1.5 rounded-xl border border-slate-700/50">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span id="live-time" class="font-mono font-medium text-slate-200">--:--:--</span>
+          <span class="text-slate-600">|</span>
+          <span id="live-date" class="text-slate-300">--</span>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Semester V: In Session</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3.5">
+        <!-- Quick Emergency SOS Button -->
+        <button onclick="triggerSOSModal()" class="flex items-center gap-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-xl shadow-lg shadow-rose-600/30 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+          <i data-lucide="shield-alert" class="w-4 h-4"></i>
+          <span>CAMPUS SOS</span>
+        </button>
+
+        <!-- Quick AI Ask Button -->
+        <button onclick="switchTab('copilot')" class="flex items-center gap-2 text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-3 py-2 rounded-xl transition">
+          <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
+          <span>Ask UniBot</span>
+        </button>
+
+        <div class="h-6 w-[1px] bg-slate-800"></div>
+
+        <!-- Student Profile Pill -->
+        <div class="flex items-center gap-2 text-xs text-slate-300 bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-700/50">
+          <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+          <span class="font-semibold">Aryan</span>
+          <span class="text-slate-500 text-[11px]">(CSE Sem 5)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- TAB CONTENTS -->
+    <main class="p-8 flex-1 space-y-8">
+      
+      <!-- ============================================== -->
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <!-- ============================================== -->
+      <section id="tab-dashboard" class="tab-pane space-y-6">
+        <!-- Welcome Hero Banner -->
+        <div class="relative overflow-hidden rounded-2xl p-7 bg-gradient-to-r from-indigo-900/60 via-slate-900/80 to-slate-900/90 border border-indigo-500/30 shadow-xl backdrop-blur-md">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+                Good morning, Aryan! You are all set for today.
+              </div>
+              <h2 class="text-3xl font-display font-extrabold text-white tracking-tight">
+                Welcome to <span class="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">CampusPulse</span>
+              </h2>
+              <p class="text-slate-400 text-sm max-w-xl">
+                Your live campus companion: real-time class room navigation, attendance predictive analyzer, today's live mess menu, and instant online fee clearance.
+              </p>
+            </div>
+
+            <!-- Next Up Class Quick Pill -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-4 rounded-xl flex items-center gap-4 min-w-[280px]">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                <i data-lucide="map-pin" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-[11px] text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                  Next Class In 15 Mins
+                </p>
+                <h4 class="text-sm font-bold text-white">CS-304: AI & Machine Learning</h4>
+                <p class="text-xs text-slate-400">Aryabhatta Block • Room 102</p>
+                <button onclick="navigateTo('mandovi-hostel', 'aryabhatta', 'Room 102')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 mt-1">
+                  <span>Get Walking Route</span>
+                  <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Key Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Card 1: Overall Attendance -->
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition group backdrop-blur-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Attendance</span>
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="percent" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-display font-extrabold text-white" id="stat-attendance">84.6%</span>
+              <span class="text-xs font-semibold text-emerald-400 flex items-center">+9.6% above criteria</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+              <div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" style="width: 84.6%"></div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2">Criteria: 75% required for final exams</p>
+          </div>
+
+          <!-- Card 2: Academic CGPA -->
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition group backdrop-blur-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Academic CGPA</span>
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
+                <i data-lucide="award" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-display font-extrabold text-white">8.74</span>
+              <span class="text-xs font-semibold text-indigo-400">Top 5% in CSE</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-3">20 Registered Credits • 6 Active Courses</p>
+          </div>
+
+          <!-- Card 3: Pending Fees -->
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-amber-500/40 transition group backdrop-blur-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fee Balance</span>
+              <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-display font-extrabold text-amber-400" id="stat-fee-due">₹14,500</span>
+              <span class="text-xs font-semibold text-amber-400">Due Nov 25</span>
+            </div>
+            <button onclick="switchTab('fees')" class="mt-3 text-xs w-full py-1.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold hover:bg-amber-500/30 border border-amber-500/40 transition flex items-center justify-center gap-1.5">
+              <span>Pay Dues Online</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 4: Hostel & Mess Info -->
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition group backdrop-blur-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hostel & Mess</span>
+              <div class="w-9 h-9 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center">
+                <i data-lucide="home" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <h4 class="text-base font-bold text-white">Mandovi Block B</h4>
+            <p class="text-xs text-indigo-400 font-semibold">Room B-312 • North Mess</p>
+            <div class="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+              <span>Today Lunch:</span>
+              <span class="font-bold text-emerald-400">Chole Bhature & Halwa</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Section: Today's Schedule & Quick Mess Preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Column 1 & 2: Today's Interactive Schedule -->
+          <div class="lg:col-span-2 p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="calendar" class="w-5 h-5 text-indigo-400"></i>
+                  Today's Schedule (Wednesday)
+                </h3>
+                <p class="text-xs text-slate-400">Synchronized with campus block locations</p>
+              </div>
+              <button onclick="switchTab('timetable')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                <span>View Full Week</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Schedule List -->
+            <div class="space-y-3" id="dashboard-schedule-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Column 3: Quick Mess & Food Card -->
+          <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md space-y-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                  <i data-lucide="utensils" class="w-5 h-5 text-amber-400"></i>
+                  Today's Mess Menu
+                </h3>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">Wednesday</span>
+              </div>
+
+              <!-- Next Meal Spotlight -->
+              <div class="p-4 rounded-xl bg-gradient-to-tr from-amber-500/10 to-orange-500/10 border border-amber-500/25 mb-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Lunch Serving Now (12:30 - 2:30 PM)</span>
+                  <span class="text-xs font-mono font-semibold text-slate-300">820 kcal</span>
+                </div>
+                <h4 class="text-base font-bold text-white mt-1.5">Chole Bhature with Pulao Rice</h4>
+                <p class="text-xs text-slate-400 mt-1">Accompanied with Boondi Raita, Onion Pickle & Hot Moong Dal Halwa.</p>
+              </div>
+
+              <!-- Dinner Preview -->
+              <div class="p-3.5 rounded-xl bg-slate-800/40 border border-slate-700/60">
+                <span class="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">Dinner Tonight (7:30 - 9:45 PM)</span>
+                <h5 class="text-sm font-semibold text-slate-200 mt-0.5">Shahi Paneer / Egg Masala, Yellow Dal, Missi Roti & Ice Cream</h5>
+              </div>
+            </div>
+
+            <button onclick="switchTab('mess')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition flex items-center justify-center gap-2 border border-slate-700">
+              <i data-lucide="message-square" class="w-4 h-4 text-amber-400"></i>
+              <span>Rate Today's Food or View Weekly Menu</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: ATTENDANCE & BUNK PREDICTOR -->
+      <!-- ============================================== -->
+      <section id="tab-attendance" class="tab-pane hidden space-y-6">
+        <!-- Attendance Header & Bunk Advisor Hero -->
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900/80 to-slate-900 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-md">
+          <div class="space-y-2">
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              Smart Attendance Analytics
+            </span>
+            <h2 class="text-2xl font-bold text-white">Subject Attendance & "Safe Bunk" Advisor</h2>
+            <p class="text-xs text-slate-400 max-w-xl">
+              Calculates real-time attendance thresholds. Never risk a debarment again: our algorithm calculates exactly how many classes you can afford to skip while keeping attendance above 75%.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-6 bg-slate-800/60 px-6 py-4 rounded-2xl border border-slate-700">
+            <div class="text-center">
+              <span class="text-3xl font-display font-extrabold text-emerald-400" id="att-summary-overall">84.6%</span>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Overall Score</p>
+            </div>
+            <div class="h-10 w-[1px] bg-slate-700"></div>
+            <div class="text-center">
+              <span class="text-2xl font-display font-extrabold text-white">149 / 176</span>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Classes Attended</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject List with Bunk Counters -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="attendance-cards-container">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Interactive What-If Simulator Calculator -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-indigo-500/30 backdrop-blur-md space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Interactive Attendance Simulator</h3>
+              <p class="text-xs text-slate-400">Select a course to test future bunk or attendance scenarios</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end pt-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Select Course</label>
+              <select id="sim-course" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <option value="CS-302">CS-302: Computer Networks & Security (71.9%)</option>
+                <option value="CS-301">CS-301: Database Management Systems (87.5%)</option>
+                <option value="CS-304">CS-304: Artificial Intelligence & ML (91.2%)</option>
+                <option value="MA-301">MA-301: Discrete Mathematical Structures (75.0%)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Future Scenario</label>
+              <select id="sim-action" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <option value="bunk">If I Bunk (Miss) Next Classes</option>
+                <option value="attend">If I Attend Next Classes</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Number of Classes: <span id="sim-count-label" class="text-indigo-400 font-bold">2</span></label>
+              <input type="range" id="sim-count" min="1" max="10" value="2" class="w-full accent-indigo-500" oninput="document.getElementById('sim-count-label').innerText = this.value">
+            </div>
+
+            <button onclick="runAttendanceSimulation()" class="py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Simulate Impact</span>
+            </button>
+          </div>
+
+          <!-- Simulation Result Box -->
+          <div id="sim-result-box" class="hidden p-4 rounded-xl border transition-all mt-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: CAMPUS MAP & BLOCK LOCATIONS -->
+      <!-- ============================================== -->
+      <section id="tab-map" class="tab-pane hidden space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="map" class="w-6 h-6 text-cyan-400"></i>
+              Interactive Campus Navigation & Block Explorer
+            </h2>
+            <p class="text-xs text-slate-400">Find any academic hall, hostel room, canteen, or administrative desk with walking directions</p>
+          </div>
+
+          <!-- Route Planner Dropdowns -->
+          <div class="flex items-center gap-3">
+            <select id="route-from" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+              <option value="mandovi-hostel">From: Mandovi Hostel (Your Room)</option>
+              <option value="central-mess">From: Central Mess</option>
+              <option value="central-library">From: Tagore Central Library</option>
+            </select>
+            <select id="route-to" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+              <option value="aryabhatta">To: Aryabhatta Block (Room 304)</option>
+              <option value="ramanujan">To: Ramanujan Block (LH-2)</option>
+              <option value="cv-raman">To: C.V. Raman Labs</option>
+              <option value="health-center">To: Campus Medical Center</option>
+            </select>
+            <button onclick="calculateSelectedRoute()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-cyan-600/30">
+              <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+              <span>Navigate</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2D Canvas Campus Map -->
+        <div class="relative bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl p-4">
+          <div class="absolute top-6 left-6 z-10 bg-slate-900/80 backdrop-blur-md border border-slate-700/70 p-3 rounded-xl text-xs space-y-1">
+            <p class="font-bold text-white flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              Live Campus Map (100+ Acres)
+            </p>
+            <p class="text-slate-400 text-[11px]">Click on any building pin to view departments & rooms</p>
+          </div>
+
+          <!-- Map SVG Visual Layout -->
+          <svg id="campus-svg-map" viewBox="0 0 1000 550" class="w-full h-[420px] rounded-xl bg-[#090d16] border border-slate-800/80">
+            <!-- Grid Lines -->
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="1000" height="550" fill="url(#grid)" />
+
+            <!-- Main Walkway Path Lines -->
+            <path d="M 180 440 L 380 380 L 500 320 L 320 160" stroke="#334155" stroke-width="6" stroke-dasharray="4 4" fill="none" />
+            <path d="M 500 320 L 500 180 L 680 220 L 820 240" stroke="#334155" stroke-width="6" stroke-dasharray="4 4" fill="none" />
+            <path d="M 500 320 L 680 350 L 800 440" stroke="#334155" stroke-width="6" stroke-dasharray="4 4" fill="none" />
+            <path d="M 180 440 L 260 280 L 320 160" stroke="#334155" stroke-width="6" stroke-dasharray="4 4" fill="none" />
+
+            <!-- Dynamic Route Overlay Path (Drawn by JS) -->
+            <path id="active-route-path" d="" stroke="#06b6d4" stroke-width="6" stroke-linecap="round" fill="none" class="transition-all duration-500 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+
+            <!-- Building Nodes / Blocks rendered via SVG groups -->
+            <g id="map-blocks-group"></g>
+          </svg>
+        </div>
+
+        <!-- Campus Blocks Information Cards -->
+        <div>
+          <h3 class="text-base font-bold text-white mb-4">Campus Buildings & Department Index</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="blocks-info-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: TIMETABLE & CLASSES -->
+      <!-- ============================================== -->
+      <section id="tab-timetable" class="tab-pane hidden space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="calendar" class="w-6 h-6 text-indigo-400"></i>
+              Weekly Academic Timetable & Classroom Locator
+            </h2>
+            <p class="text-xs text-slate-400">Class schedules automatically mapped to campus block directions</p>
+          </div>
+
+          <!-- Day Filter Buttons -->
+          <div class="flex items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800" id="timetable-day-buttons">
+            <button onclick="loadTimetable('Monday')" class="day-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Mon</button>
+            <button onclick="loadTimetable('Tuesday')" class="day-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Tue</button>
+            <button onclick="loadTimetable('Wednesday')" class="day-filter-btn active px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 transition">Wed</button>
+            <button onclick="loadTimetable('Thursday')" class="day-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Thu</button>
+            <button onclick="loadTimetable('Friday')" class="day-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Fri</button>
+          </div>
+        </div>
+
+        <!-- Timetable Cards Container -->
+        <div class="space-y-3.5" id="timetable-slots-container">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 5: MESS MENU & FOOD REVIEWS -->
+      <!-- ============================================== -->
+      <section id="tab-mess" class="tab-pane hidden space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="utensils-crossed" class="w-6 h-6 text-amber-400"></i>
+              Central Mess Menu & Live Student Food Reviews
+            </h2>
+            <p class="text-xs text-slate-400">Real-time daily breakfast, lunch, snacks, and dinner updates with feedback rating</p>
+          </div>
+
+          <!-- Day Selector for Mess -->
+          <div class="flex items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800" id="mess-day-buttons">
+            <button onclick="loadMessMenu('Monday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Mon</button>
+            <button onclick="loadMessMenu('Tuesday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Tue</button>
+            <button onclick="loadMessMenu('Wednesday')" class="mess-day-btn active px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-amber-600">Wed</button>
+            <button onclick="loadMessMenu('Thursday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Thu</button>
+            <button onclick="loadMessMenu('Friday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Fri</button>
+            <button onclick="loadMessMenu('Saturday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Sat</button>
+            <button onclick="loadMessMenu('Sunday')" class="mess-day-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400">Sun</button>
+          </div>
+        </div>
+
+        <!-- 4 Meal Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="mess-meals-grid">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Rating & Student Feedback Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+          <!-- Rate Today's Meal Form -->
+          <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="star" class="w-4 h-4 text-amber-400"></i>
+              Rate Today's Meal Quality
+            </h3>
+            <p class="text-xs text-slate-400">Help the mess committee maintain high hygiene and food standards.</p>
+
+            <form id="mess-rating-form" onsubmit="submitMessReview(event)" class="space-y-3 pt-1">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Meal Session</label>
+                <select id="review-meal-type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                  <option value="Lunch">Lunch (Chole Bhature & Halwa)</option>
+                  <option value="Breakfast">Breakfast (Poha & Jalebi)</option>
+                  <option value="Snacks">Snacks (Pav Bhaji)</option>
+                  <option value="Dinner">Dinner (Shahi Paneer)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Your Rating</label>
+                <div class="flex items-center gap-2 text-amber-400 text-lg cursor-pointer" id="star-rating-picker">
+                  <span onclick="setStarRating(1)" class="star">★</span>
+                  <span onclick="setStarRating(2)" class="star">★</span>
+                  <span onclick="setStarRating(3)" class="star">★</span>
+                  <span onclick="setStarRating(4)" class="star">★</span>
+                  <span onclick="setStarRating(5)" class="star">★</span>
+                  <input type="hidden" id="selected-rating" value="5">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Comments / Suggestions</label>
+                <textarea id="review-comment" rows="2" placeholder="e.g. Taste was awesome today, clean dining hall!" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+              </div>
+
+              <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-amber-600/30">
+                Submit Food Feedback
+              </button>
+            </form>
+          </div>
+
+          <!-- Student Live Reviews Stream -->
+          <div class="lg:col-span-2 p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <i data-lucide="message-square-quote" class="w-4 h-4 text-cyan-400"></i>
+                Student Reviews & Live Community Feed
+              </span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold">4.8 / 5 Avg Rating</span>
+            </h3>
+
+            <div class="space-y-3" id="mess-reviews-stream">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 6: FEES & ONLINE PAYMENT -->
+      <!-- ============================================== -->
+      <section id="tab-fees" class="tab-pane hidden space-y-6">
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900/80 to-slate-900 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-md">
+          <div class="space-y-2">
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              Student Accounts & Dues
+            </span>
+            <h2 class="text-2xl font-bold text-white">Semester V Fee Portal & Digital Receipts</h2>
+            <p class="text-xs text-slate-400 max-w-xl">
+              Pay remaining mess advance and exam fees securely via UPI, Cards, or NetBanking. Instant automated tax invoice and university seal receipts generated.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-6 bg-slate-800/60 px-6 py-4 rounded-2xl border border-slate-700">
+            <div>
+              <span class="text-xs text-slate-400 uppercase font-semibold">Pending Due:</span>
+              <div class="text-3xl font-display font-extrabold text-amber-400" id="fee-header-due">₹14,500</div>
+              <p class="text-[10px] text-slate-500">Last Date: 25 Nov 2026</p>
+            </div>
+            <button onclick="openPaymentModal()" id="btn-pay-now-primary" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition transform hover:scale-[1.03]">
+              Pay Dues Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Breakdown Table -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md space-y-4">
+          <h3 class="text-base font-bold text-white">Fee Structure & Payment Ledger (Semester V)</h3>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-800/60 text-slate-400 uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th class="py-3 px-4 rounded-l-xl">Fee Head</th>
+                  <th class="py-3 px-4">Amount</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Paid On</th>
+                  <th class="py-3 px-4 rounded-r-xl">Reference TXN</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/80" id="fee-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Receipts History -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md space-y-4">
+          <h3 class="text-base font-bold text-white flex items-center justify-between">
+            <span>Verified Digital Fee Receipts</span>
+            <span class="text-xs text-slate-400 font-normal">Official digitally signed documents</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="receipts-cards-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 7: CAMPUS AI COPILOT (UNIBOT) -->
+      <!-- ============================================== -->
+      <section id="tab-copilot" class="tab-pane hidden space-y-6">
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-indigo-950/40 to-slate-900 border border-cyan-500/30 flex items-center justify-between backdrop-blur-md">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+              Campus Intelligence
+            </span>
+            <h2 class="text-2xl font-bold text-white mt-2">UniBot — 24/7 Campus AI Copilot</h2>
+            <p class="text-xs text-slate-400">Ask about classes, walking routes, attendance safe limits, mess menu, or exam notices.</p>
+          </div>
+
+          <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/20">
+            <i data-lucide="bot" class="w-7 h-7"></i>
+          </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md flex flex-col h-[520px]">
+          <!-- Messages Stream -->
+          <div class="flex-1 overflow-y-auto space-y-4 pr-2" id="chat-messages-container">
+            <!-- Initial Bot Message -->
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/30">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+              </div>
+              <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 max-w-xl text-xs space-y-2">
+                <p class="text-slate-200">
+                  Hi <strong>Aryan</strong>! I'm your CampusPulse AI Assistant. How can I help you today?
+                </p>
+                <div class="flex flex-wrap gap-2 pt-1">
+                  <button onclick="sendQuickPrompt('Where is my next class?')" class="px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition">
+                    📍 Where is my next class?
+                  </button>
+                  <button onclick="sendQuickPrompt('Can I bunk tomorrow class?')" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition">
+                    📊 Can I bunk tomorrow's class?
+                  </button>
+                  <button onclick="sendQuickPrompt('What is for lunch in mess today?')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
+                    🍽️ What's in mess today?
+                  </button>
+                  <button onclick="sendQuickPrompt('How much fee is pending?')" class="px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 transition">
+                    💳 Fee status
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form onsubmit="handleChatSubmit(event)" class="mt-4 pt-4 border-t border-slate-800 flex items-center gap-3">
+            <input type="text" id="chat-input" placeholder="Ask anything in English or Hindi (e.g. 'Class room 304 kaha hai?', 'Attendance status')..." class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
+            <button type="submit" class="p-3 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-xl transition shadow-lg shadow-indigo-600/30">
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: PAYMENT GATEWAY (SIMULATED) -->
+  <!-- ============================================== -->
+  <div id="payment-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closePaymentModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Campus FastPay Checkout</span>
+        <h3 class="text-lg font-bold text-white mt-1">Clear Outstanding Semester Dues</h3>
+        <p class="text-xs text-slate-400">Mess Advance (₹10,000) + Exam Tech Fee (₹4,500)</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
+        <span class="text-xs text-slate-300 font-medium">Total Amount Due</span>
+        <span class="text-2xl font-display font-extrabold text-amber-400">₹14,500</span>
+      </div>
+
+      <!-- Payment Modes -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300">Select Payment Method</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="selectPayMode('upi')" id="paymode-upi" class="paymode-btn active p-3 rounded-xl border border-indigo-500 bg-indigo-600/20 text-center text-xs font-bold text-white">
+            <i data-lucide="smartphone" class="w-4 h-4 mx-auto mb-1 text-cyan-400"></i>
+            UPI / GPay
+          </button>
+          <button type="button" onclick="selectPayMode('card')" id="paymode-card" class="paymode-btn p-3 rounded-xl border border-slate-700 bg-slate-800 text-center text-xs font-semibold text-slate-300">
+            <i data-lucide="credit-card" class="w-4 h-4 mx-auto mb-1 text-slate-400"></i>
+            Debit/Credit
+          </button>
+          <button type="button" onclick="selectPayMode('netbanking')" id="paymode-netbanking" class="paymode-btn p-3 rounded-xl border border-slate-700 bg-slate-800 text-center text-xs font-semibold text-slate-300">
+            <i data-lucide="landmark" class="w-4 h-4 mx-auto mb-1 text-slate-400"></i>
+            NetBanking
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Mode Preview (e.g. UPI QR simulation) -->
+      <div id="pay-details-container" class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center space-y-2">
+        <div class="w-32 h-32 mx-auto bg-white p-2 rounded-xl flex items-center justify-center">
+          <!-- Stylized QR Code placeholder -->
+          <div class="w-full h-full bg-slate-900 rounded flex flex-col items-center justify-center text-[10px] text-cyan-400 font-mono">
+            <i data-lucide="qr-code" class="w-12 h-12 mb-1"></i>
+            <span>SCAN WITH GPAY</span>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400">UPI ID: <span class="text-indigo-400 font-mono">campus.pay@univ</span></p>
+      </div>
+
+      <button onclick="processFinalPayment()" id="btn-submit-payment" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/25 transition">
+        Confirm & Pay ₹14,500
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: DIGITAL RECEIPT VIEWER -->
+  <!-- ============================================== -->
+  <div id="receipt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 rounded-2xl w-full max-w-lg p-7 shadow-2xl relative">
+      <button onclick="closeReceiptModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center border-b pb-4 mb-4">
+        <h2 class="font-display font-extrabold text-lg text-indigo-900 tracking-tight">CAMPUS UNIVERSITY OF TECHNOLOGY</h2>
+        <p class="text-xs text-slate-500 font-medium">Finance & Student Accounts Department • Official e-Receipt</p>
+      </div>
+
+      <div class="space-y-3 text-xs" id="receipt-modal-content">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="pt-5 mt-4 border-t flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">Digitally Verified & Stamped</span>
+        <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-700 flex items-center gap-1.5 shadow">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Save as PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CAMPUS SOS DISPATCH -->
+  <!-- ============================================== -->
+  <div id="sos-modal" class="fixed inset-0 bg-rose-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-rose-600/60 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl shadow-rose-900/40 text-center relative">
+      <button onclick="closeSOSModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="w-14 h-14 rounded-2xl bg-rose-600/20 text-rose-500 border border-rose-500/40 flex items-center justify-center mx-auto animate-bounce">
+        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-display font-bold text-white">Campus Emergency SOS</h3>
+        <p class="text-xs text-slate-400 mt-1">One-touch dispatch to University Security & 24/7 Medical Clinic.</p>
+      </div>
+
+      <div class="p-3 bg-slate-800 rounded-xl text-xs text-left space-y-1">
+        <p class="text-slate-300 font-semibold">Your Current Location:</p>
+        <p class="text-indigo-400 font-bold">Mandovi Boys Hostel, Block B, Room 312</p>
+        <p class="text-[11px] text-slate-500">Coordinates: Lat 28.5450, Lon 77.1926 (Verified)</p>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <button onclick="dispatchSOS('Medical Emergency / Ambulance')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
+          <i data-lucide="ambulance" class="w-4 h-4"></i>
+          <span>Request Medical Ambulance</span>
+        </button>
+        <button onclick="dispatchSOS('Security / Safety Issue')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition flex items-center justify-center gap-2 border border-slate-700">
+          <i data-lucide="shield" class="w-4 h-4 text-cyan-400"></i>
+          <span>Alert Campus Security Patrol</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
+
