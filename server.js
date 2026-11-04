@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -352,7 +351,7 @@ app.post('/api/attendance/simulate', (req, res) => {
 app.get('/api/timetable', (req, res) => {
   const day = req.query.day || "Wednesday";
   const schedule = db.timetable[day] || db.timetable["Wednesday"];
-  
+
   // Highlight next upcoming lecture (mock for 10:30 AM Wednesday)
   const enriched = schedule.map((slot, index) => ({
     ...slot,

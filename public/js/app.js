@@ -1,5 +1,5 @@
 // ==========================================================
-// CampusPulse — Client Application Engine
+// CampusPulse — Client Application Engine (shadcn/ui Edition)
 // ==========================================================
 
 let studentData = null;
@@ -22,8 +22,8 @@ function initLiveClock() {
 
   function update() {
     const now = new Date();
-    timeElem.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    dateElem.innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    if (timeElem) timeElem.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (dateElem) dateElem.innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   }
   update();
   setInterval(update, 1000);
@@ -83,12 +83,15 @@ function renderDashboardOverview() {
   if (!studentData) return;
 
   // Stats
-  document.getElementById('stat-attendance').innerText = `${studentData.stats.overallAttendance}%`;
-  document.getElementById('stat-fee-due').innerText = `₹${studentData.stats.pendingFee.toLocaleString()}`;
+  const statAtt = document.getElementById('stat-attendance');
+  const statFee = document.getElementById('stat-fee-due');
+  if (statAtt) statAtt.innerText = `${studentData.stats.overallAttendance}%`;
+  if (statFee) statFee.innerText = `₹${studentData.stats.pendingFee.toLocaleString()}`;
 
-  if (studentData.stats.pendingFee === 0) {
-    document.getElementById('nav-fee-badge').innerText = "Paid";
-    document.getElementById('nav-fee-badge').className = "ml-auto text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold";
+  const navFeeBadge = document.getElementById('nav-fee-badge');
+  if (studentData.stats.pendingFee === 0 && navFeeBadge) {
+    navFeeBadge.innerText = "Paid";
+    navFeeBadge.className = "ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium border border-emerald-500/30";
   }
 
   // Dashboard schedule
@@ -96,32 +99,33 @@ function renderDashboardOverview() {
     .then(r => r.json())
     .then(data => {
       const container = document.getElementById('dashboard-schedule-list');
+      if (!container) return;
       container.innerHTML = data.schedule.slice(0, 4).map(slot => `
-        <div class="p-3.5 rounded-xl border transition-all ${
+        <div class="p-3 rounded-lg border ${
           slot.isCurrent 
-            ? 'bg-gradient-to-r from-indigo-950/60 to-slate-900 border-indigo-500/50 shadow-lg shadow-indigo-500/10' 
-            : 'bg-slate-800/40 border-slate-700/60 hover:border-slate-600'
-        } flex items-center justify-between gap-4">
-          <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl ${
-              slot.isCurrent ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-700/60 text-slate-300'
-            } flex items-center justify-center font-bold text-xs">
+            ? 'border-border bg-muted/60' 
+            : 'border-border/60 bg-card/60 hover:bg-muted/30'
+        } flex items-center justify-between gap-4 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-md ${
+              slot.isCurrent ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+            } flex items-center justify-center font-mono font-medium text-xs shrink-0">
               ${slot.time.split(' - ')[0]}
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h4 class="text-xs font-bold text-white">${slot.code}: ${slot.name}</h4>
-                ${slot.isCurrent ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">LIVE NOW</span>' : ''}
+                <h4 class="text-xs font-semibold text-foreground">${slot.code}: ${slot.name}</h4>
+                ${slot.isCurrent ? '<span class="text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NOW</span>' : ''}
               </div>
-              <p class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                <i data-lucide="map-pin" class="w-3 h-3 text-cyan-400"></i>
+              <p class="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                <i data-lucide="map-pin" class="w-3 h-3 text-muted-foreground"></i>
                 <span>${slot.block} • ${slot.room}</span>
-                <span class="text-slate-600">•</span>
+                <span class="text-zinc-600">•</span>
                 <span>${slot.faculty}</span>
               </p>
             </div>
           </div>
-          <button onclick="navigateTo('mandovi-hostel', '${slot.block.toLowerCase().includes('arya') ? 'aryabhatta' : 'ramanujan'}', '${slot.room}')" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 text-xs font-semibold flex items-center gap-1 border border-indigo-500/30 transition">
+          <button onclick="navigateTo('mandovi-hostel', '${slot.block.toLowerCase().includes('arya') ? 'aryabhatta' : 'ramanujan'}', '${slot.room}')" class="btn-shadcn-secondary text-xs py-1 px-2.5 h-auto">
             <span>Route</span>
             <i data-lucide="arrow-right" class="w-3 h-3"></i>
           </button>
@@ -135,55 +139,58 @@ function renderDashboardOverview() {
 function renderAttendanceCards() {
   if (!attendanceData) return;
 
-  document.getElementById('att-summary-overall').innerText = `${attendanceData.overall}%`;
+  const summaryOverall = document.getElementById('att-summary-overall');
+  if (summaryOverall) summaryOverall.innerText = `${attendanceData.overall}%`;
 
   const container = document.getElementById('attendance-cards-container');
+  if (!container) return;
+
   container.innerHTML = attendanceData.subjects.map(sub => {
     let statusBadge = '';
     let bunkAdvice = '';
 
     if (sub.isLow) {
-      statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Below 75% Criteria</span>`;
-      bunkAdvice = `<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 flex items-center gap-2">
-        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+      statusBadge = `<span class="badge-shadcn bg-rose-500/10 text-rose-400 border-rose-500/30 text-[10px]">Debarment Risk</span>`;
+      bunkAdvice = `<div class="p-2.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 flex items-center gap-2">
+        <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0"></i>
         <span>Debarment Risk! Attend next <strong>${sub.requiredToRecover} classes</strong> consecutively to recover back to 75%.</span>
       </div>`;
     } else if (sub.isWarning) {
-      statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Borderline Safe</span>`;
-      bunkAdvice = `<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
-        <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
-        <span>Careful! You can only miss <strong>${sub.safeBunks} class</strong> before dropping into the danger zone.</span>
+      statusBadge = `<span class="badge-shadcn bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px]">Borderline Safe</span>`;
+      bunkAdvice = `<div class="p-2.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 shrink-0"></i>
+        <span>Careful! You can miss <strong>${sub.safeBunks} class</strong> before dropping below 75%.</span>
       </div>`;
     } else {
-      statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Safe Zone</span>`;
-      bunkAdvice = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center gap-2">
-        <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
+      statusBadge = `<span class="badge-shadcn bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">Safe Zone</span>`;
+      bunkAdvice = `<div class="p-2.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center gap-2">
+        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 shrink-0"></i>
         <span>Safe buffer: You can safely miss <strong>${sub.safeBunks} more classes</strong> and stay above 75%.</span>
       </div>`;
     }
 
     return `
-      <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition space-y-4 backdrop-blur-md">
+      <div class="shadcn-card p-5 space-y-4">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-mono font-bold text-cyan-400 px-2 py-0.5 rounded bg-cyan-500/10">${sub.code}</span>
-              <span class="text-[11px] text-slate-400">${sub.credits} Credits</span>
+              <span class="text-xs font-mono font-medium text-foreground px-2 py-0.5 rounded bg-muted border border-border">${sub.code}</span>
+              <span class="text-[11px] text-muted-foreground">${sub.credits} Credits</span>
             </div>
-            <h4 class="text-base font-bold text-white mt-1">${sub.name}</h4>
-            <p class="text-xs text-slate-400">Faculty: ${sub.faculty}</p>
+            <h4 class="text-sm font-semibold text-foreground mt-1.5 tracking-tight">${sub.name}</h4>
+            <p class="text-xs text-muted-foreground">Faculty: ${sub.faculty}</p>
           </div>
           ${statusBadge}
         </div>
 
         <div class="space-y-1.5">
           <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 font-medium">${sub.attended} attended of ${sub.total} classes</span>
-            <span class="font-extrabold ${sub.isLow ? 'text-rose-400' : 'text-emerald-400'} text-base">${sub.percentage}%</span>
+            <span class="text-muted-foreground font-medium">${sub.attended} attended of ${sub.total} classes</span>
+            <span class="font-mono font-bold ${sub.isLow ? 'text-rose-400' : 'text-emerald-400'} text-sm">${sub.percentage}%</span>
           </div>
-          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+          <div class="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
             <div class="h-full rounded-full transition-all duration-500 ${
-              sub.isLow ? 'bg-gradient-to-r from-rose-500 to-amber-500' : 'bg-gradient-to-r from-emerald-500 to-cyan-400'
+              sub.isLow ? 'bg-rose-500' : 'bg-emerald-500'
             }" style="width: ${Math.min(100, sub.percentage)}%"></div>
           </div>
         </div>
@@ -210,29 +217,36 @@ async function runAttendanceSimulation() {
   const data = await res.json();
 
   const box = document.getElementById('sim-result-box');
+  if (!box) return;
   box.classList.remove('hidden');
 
   const isSafe = data.projectedPercentage >= 75;
-  box.className = `p-4 rounded-xl border mt-3 transition-all ${
-    isSafe ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200' : 'bg-rose-950/30 border-rose-500/40 text-rose-200'
+  box.className = `p-3.5 rounded-lg border mt-3 transition-all ${
+    isSafe ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200' : 'bg-rose-950/20 border-rose-500/30 text-rose-200'
   }`;
 
   box.innerHTML = `
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-4">
       <div>
-        <h4 class="text-xs font-bold uppercase tracking-wider">${data.code} — Projected Scenario Result</h4>
-        <p class="text-sm mt-1">
+        <h4 class="text-xs font-mono font-semibold uppercase tracking-wider">${data.code} — Projected Scenario</h4>
+        <p class="text-xs mt-1 text-foreground">
           If you <strong>${action === 'bunk' ? 'MISS' : 'ATTEND'}</strong> next <strong>${count} class(es)</strong>, 
-          your attendance changes from <strong>${data.currentPercentage}%</strong> to <strong class="text-lg underline">${data.projectedPercentage}%</strong>.
+          your attendance moves from <strong>${data.currentPercentage}%</strong> to <strong class="font-mono text-sm underline">${data.projectedPercentage}%</strong>.
         </p>
       </div>
-      <div class="text-right">
-        <span class="px-3 py-1.5 rounded-lg text-xs font-bold ${
-          isSafe ? 'bg-emerald-500 text-white' : 'bg-rose-600 text-white animate-bounce'
+      <div class="text-right shrink-0">
+        <span class="badge-shadcn ${
+          isSafe ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
         }">${data.status}</span>
       </div>
     </div>
   `;
+
+  shadcnToast({
+    title: "Simulation Calculated",
+    description: `${data.code}: Projected attendance is ${data.projectedPercentage}% (${data.status})`,
+    variant: isSafe ? "success" : "destructive"
+  });
 }
 
 // 6. Interactive Campus SVG Map & Route Finder
@@ -241,13 +255,13 @@ function renderCampusMap() {
   if (!group || campusBlocks.length === 0) return;
 
   const colors = {
-    Academic: { fill: '#4f46e5', stroke: '#818cf8', icon: 'graduation-cap' },
-    Hostel: { fill: '#0891b2', stroke: '#22d3ee', icon: 'home' },
-    Dining: { fill: '#d97706', stroke: '#fbbf24', icon: 'utensils' },
-    Facility: { fill: '#7c3aed', stroke: '#a78bfa', icon: 'book' },
-    Administration: { fill: '#475569', stroke: '#94a3b8', icon: 'landmark' },
-    'Medical / SOS': { fill: '#e11d48', stroke: '#fb7185', icon: 'shield-alert' },
-    Sports: { fill: '#059669', stroke: '#34d399', icon: 'trophy' }
+    Academic: { fill: '#27272a', stroke: '#fafafa' },
+    Hostel: { fill: '#18181b', stroke: '#38bdf8' },
+    Dining: { fill: '#18181b', stroke: '#fbbf24' },
+    Facility: { fill: '#18181b', stroke: '#a78bfa' },
+    Administration: { fill: '#18181b', stroke: '#94a3b8' },
+    'Medical / SOS': { fill: '#18181b', stroke: '#f43f5e' },
+    Sports: { fill: '#18181b', stroke: '#34d399' }
   };
 
   group.innerHTML = campusBlocks.map(b => {
@@ -255,14 +269,14 @@ function renderCampusMap() {
     return `
       <g class="map-node" onclick="selectMapBlock('${b.id}')" transform="translate(${b.coords.x}, ${b.coords.y})">
         <!-- Building Outline Box -->
-        <rect x="-45" y="-30" width="90" height="60" rx="12" fill="${theme.fill}" fill-opacity="0.25" stroke="${theme.stroke}" stroke-width="1.8" />
+        <rect x="-45" y="-30" width="90" height="60" rx="8" fill="${theme.fill}" fill-opacity="0.85" stroke="${theme.stroke}" stroke-width="1.2" />
         
-        <!-- Center Pulsing Pin -->
-        <circle cx="0" cy="-5" r="8" fill="${theme.stroke}" />
-        <circle cx="0" cy="-5" r="14" fill="${theme.stroke}" fill-opacity="0.3" class="animate-ping" />
+        <!-- Center Pin -->
+        <circle cx="0" cy="-6" r="6" fill="${theme.stroke}" />
+        <circle cx="0" cy="-6" r="12" fill="${theme.stroke}" fill-opacity="0.25" class="animate-ping" />
 
         <!-- Block Name Tag -->
-        <text x="0" y="20" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="bold" font-family="'Plus Jakarta Sans', sans-serif">
+        <text x="0" y="18" text-anchor="middle" fill="#fafafa" font-size="9" font-weight="600" font-family="'Geist', sans-serif">
           ${b.name.split(' ')[0]}
         </text>
       </g>
@@ -274,13 +288,12 @@ function selectMapBlock(blockId) {
   const block = campusBlocks.find(b => b.id === blockId);
   if (!block) return;
 
-  // Scroll to block index card
   const el = document.getElementById(`block-card-${block.id}`);
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el.classList.add('border-cyan-400', 'shadow-cyan-500/20', 'shadow-2xl');
+    el.classList.add('border-primary', 'shadow-lg');
     setTimeout(() => {
-      el.classList.remove('border-cyan-400', 'shadow-cyan-500/20', 'shadow-2xl');
+      el.classList.remove('border-primary', 'shadow-lg');
     }, 2500);
   }
 }
@@ -290,30 +303,30 @@ function renderCampusBlocksIndex() {
   if (!container || campusBlocks.length === 0) return;
 
   container.innerHTML = campusBlocks.map(b => `
-    <div id="block-card-${b.id}" class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition space-y-3 backdrop-blur-md">
+    <div id="block-card-${b.id}" class="shadcn-card p-5 space-y-3">
       <div class="flex items-center justify-between">
-        <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+        <span class="badge-shadcn bg-secondary text-foreground text-[10px]">
           ${b.category}
         </span>
-        <span class="text-xs text-indigo-400 font-semibold">${b.floors} Floors • ${b.totalRooms} Rooms</span>
+        <span class="text-xs text-muted-foreground font-mono">${b.floors} Floors • ${b.totalRooms} Rooms</span>
       </div>
 
-      <h4 class="text-base font-bold text-white">${b.name}</h4>
-      <p class="text-xs text-slate-400">Departments: <span class="text-slate-300">${b.departments.join(', ')}</span></p>
+      <h4 class="text-sm font-semibold tracking-tight text-foreground">${b.name}</h4>
+      <p class="text-xs text-muted-foreground">Departments: <span class="text-foreground">${b.departments.join(', ')}</span></p>
 
-      <div class="p-2.5 rounded-xl bg-slate-800/50 text-xs text-slate-300 space-y-1">
-        <p class="text-[11px] font-bold text-cyan-400 uppercase">Key Features:</p>
-        <ul class="list-disc list-inside text-slate-400 text-[11px] space-y-0.5">
+      <div class="p-2.5 rounded-md bg-muted/40 text-xs text-muted-foreground space-y-1 border border-border/50">
+        <p class="text-[10px] font-mono font-semibold text-foreground uppercase">Key Features:</p>
+        <ul class="list-disc list-inside text-[11px] space-y-0.5">
           ${b.keyHighlights.map(h => `<li>${h}</li>`).join('')}
         </ul>
       </div>
 
-      <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
-        <span class="text-slate-400">From Mandovi Hostel:</span>
-        <span class="font-bold text-emerald-400">${b.distanceFromHostel}</span>
+      <div class="pt-2 border-t border-border flex items-center justify-between text-xs">
+        <span class="text-muted-foreground">From Mandovi Hostel:</span>
+        <span class="font-mono font-medium text-emerald-400">${b.distanceFromHostel}</span>
       </div>
 
-      <button onclick="navigateTo('mandovi-hostel', '${b.id}', 'Main Lobby')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+      <button onclick="navigateTo('mandovi-hostel', '${b.id}', 'Main Entrance')" class="btn-shadcn-secondary w-full text-xs">
         <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
         <span>Get Walking Directions</span>
       </button>
@@ -335,7 +348,6 @@ async function navigateTo(from, to, room) {
   const res = await fetch(`/api/campus/route?from=${from}&to=${to}&room=${encodeURIComponent(room)}`);
   const data = await res.json();
 
-  // Draw animated cyan line on SVG
   const pathElem = document.getElementById('active-route-path');
   if (pathElem && data.pathCoordinates.length >= 2) {
     const [p1, p2, p3] = data.pathCoordinates;
@@ -343,46 +355,51 @@ async function navigateTo(from, to, room) {
     pathElem.setAttribute('d', dStr);
   }
 
-  alert(`🗺️ Campus Walking Directions:\n\n• Route: ${data.from} ➔ ${data.to}\n• Distance: approx ${data.distanceMeters} meters\n• Walking Time: ~${data.walkTimeMinutes} minutes\n\nDirections:\n1. ${data.steps[0]}\n2. ${data.steps[1]}\n3. ${data.steps[3]}`);
+  shadcnToast({
+    title: `Route: ${data.from} ➔ ${data.to}`,
+    description: `~${data.distanceMeters}m • Est. ${data.walkTimeMinutes} mins. Follow walking path highlighted on map.`,
+    variant: "default",
+    duration: 5000
+  });
 }
 
 // 7. Timetable Loader
 async function loadTimetable(day) {
   currentDay = day;
 
-  // Update button states
+  // Update tabs
   document.querySelectorAll('.day-filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
-    btn.classList.toggle('bg-indigo-600', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
-    btn.classList.toggle('text-white', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
   });
 
   const res = await fetch(`/api/timetable?day=${day}`);
   const data = await res.json();
 
   const container = document.getElementById('timetable-slots-container');
+  if (!container) return;
+
   container.innerHTML = data.schedule.map(slot => `
-    <div class="p-4 rounded-2xl bg-slate-900/60 border ${
-      slot.isCurrent ? 'border-indigo-500 shadow-lg shadow-indigo-500/10 bg-indigo-950/20' : 'border-slate-800'
-    } flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-md">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl ${
-          slot.isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300'
-        } flex flex-col items-center justify-center font-bold text-xs p-1 text-center shrink-0">
-          <span class="text-[10px] text-slate-400 font-mono">${slot.time.split(' - ')[0]}</span>
-          <span class="text-[10px] text-indigo-300 font-mono">${slot.time.split(' - ')[1]}</span>
+    <div class="shadcn-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+      slot.isCurrent ? 'border-primary/50 bg-muted/20' : ''
+    }">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-lg ${
+          slot.isCurrent ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+        } flex flex-col items-center justify-center font-mono font-medium text-xs p-1 text-center shrink-0">
+          <span class="text-[10px] text-muted-foreground">${slot.time.split(' - ')[0]}</span>
+          <span class="text-[10px] font-bold">${slot.time.split(' - ')[1]}</span>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-xs font-mono font-bold text-cyan-400 px-2 py-0.5 rounded bg-cyan-500/10">${slot.code}</span>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">${slot.type}</span>
-            ${slot.isCurrent ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400">ACTIVE SESSION</span>' : ''}
+            <span class="text-xs font-mono font-medium text-foreground px-1.5 py-0.5 rounded bg-muted border border-border">${slot.code}</span>
+            <span class="badge-shadcn bg-secondary text-foreground text-[10px]">${slot.type}</span>
+            ${slot.isCurrent ? '<span class="badge-shadcn bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">ACTIVE NOW</span>' : ''}
           </div>
-          <h4 class="text-sm font-bold text-white mt-1">${slot.name}</h4>
-          <p class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-            <span class="text-indigo-400 font-semibold">${slot.block}</span>
+          <h4 class="text-xs font-semibold text-foreground mt-1 tracking-tight">${slot.name}</h4>
+          <p class="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+            <span class="text-foreground">${slot.block}</span>
             <span>•</span>
-            <span class="text-slate-200">${slot.room}</span>
+            <span>${slot.room}</span>
             <span>•</span>
             <span>${slot.faculty}</span>
           </p>
@@ -390,9 +407,9 @@ async function loadTimetable(day) {
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="navigateTo('mandovi-hostel', '${slot.block.toLowerCase().includes('arya') ? 'aryabhatta' : 'ramanujan'}', '${slot.room}')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow transition">
+        <button onclick="navigateTo('mandovi-hostel', '${slot.block.toLowerCase().includes('arya') ? 'aryabhatta' : 'ramanujan'}', '${slot.room}')" class="btn-shadcn-secondary text-xs">
           <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-          <span>Locate Classroom</span>
+          <span>Locate Room</span>
         </button>
       </div>
     </div>
@@ -403,11 +420,8 @@ async function loadTimetable(day) {
 
 // 8. Mess Menu Loader & Feedback
 async function loadMessMenu(day) {
-  // Update buttons
   document.querySelectorAll('.mess-day-btn').forEach(btn => {
     btn.classList.toggle('active', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
-    btn.classList.toggle('bg-amber-600', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
-    btn.classList.toggle('text-white', btn.innerText.toLowerCase() === day.slice(0, 3).toLowerCase());
   });
 
   const res = await fetch(`/api/mess/menu?day=${day}`);
@@ -417,45 +431,49 @@ async function loadMessMenu(day) {
   const meals = [
     { name: "Breakfast", time: "7:30 - 9:30 AM", data: data.menu.breakfast, icon: "coffee" },
     { name: "Lunch", time: "12:30 - 2:30 PM", data: data.menu.lunch, icon: "sun" },
-    { name: "High Tea / Snacks", time: "5:00 - 6:30 PM", data: data.menu.snacks, icon: "cookie" },
+    { name: "High Tea", time: "5:00 - 6:30 PM", data: data.menu.snacks, icon: "cookie" },
     { name: "Dinner", time: "7:30 - 9:45 PM", data: data.menu.dinner, icon: "moon" }
   ];
 
   const grid = document.getElementById('mess-meals-grid');
-  grid.innerHTML = meals.map(m => `
-    <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/40 transition space-y-3 backdrop-blur-md flex flex-col justify-between">
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">${m.name}</span>
-          <span class="text-[11px] text-slate-400">${m.time}</span>
+  if (grid) {
+    grid.innerHTML = meals.map(m => `
+      <div class="shadcn-card p-5 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-foreground uppercase tracking-wider">${m.name}</span>
+            <span class="text-[10px] text-muted-foreground font-mono">${m.time}</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="badge-shadcn bg-secondary text-foreground text-[10px]">${m.data.tag}</span>
+            <span class="text-muted-foreground font-mono text-[11px]">${m.data.calories} kcal</span>
+          </div>
+          <h4 class="text-xs font-medium text-foreground pt-1 leading-snug">${m.data.items}</h4>
         </div>
-        <div class="flex items-center justify-between text-xs">
-          <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 font-semibold text-[10px]">${m.data.tag}</span>
-          <span class="text-slate-400 font-mono text-[11px]">${m.data.calories} kcal</span>
+        <div class="pt-2 border-t border-border text-[10px] text-muted-foreground flex items-center gap-1">
+          <i data-lucide="check" class="w-3 h-3 text-emerald-400"></i>
+          <span>Verified Diet Quality</span>
         </div>
-        <h4 class="text-sm font-bold text-white pt-1 leading-snug">${m.data.items}</h4>
       </div>
-      <div class="pt-2 border-t border-slate-800 text-[11px] text-emerald-400 flex items-center gap-1">
-        <i data-lucide="check" class="w-3 h-3"></i>
-        <span>Diet Approved by Mess Secretary</span>
-      </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   // Render recent reviews
   const stream = document.getElementById('mess-reviews-stream');
-  stream.innerHTML = data.recentRatings.map(r => `
-    <div class="p-3.5 rounded-xl bg-slate-800/40 border border-slate-700/60 flex items-start justify-between gap-4">
-      <div class="space-y-1">
-        <div class="flex items-center gap-2">
-          <h5 class="text-xs font-bold text-white">${r.student}</h5>
-          <span class="text-amber-400 text-xs">★ ${r.rating}.0</span>
+  if (stream) {
+    stream.innerHTML = data.recentRatings.map(r => `
+      <div class="p-3 rounded-lg bg-muted/30 border border-border/60 flex items-start justify-between gap-4">
+        <div class="space-y-0.5">
+          <div class="flex items-center gap-2">
+            <h5 class="text-xs font-semibold text-foreground">${r.student}</h5>
+            <span class="text-amber-400 text-xs font-mono font-medium">★ ${r.rating}.0</span>
+          </div>
+          <p class="text-xs text-muted-foreground">"${r.comment}"</p>
         </div>
-        <p class="text-xs text-slate-300">"${r.comment}"</p>
+        <span class="text-[10px] text-muted-foreground font-mono whitespace-nowrap">${r.time}</span>
       </div>
-      <span class="text-[11px] text-slate-500 whitespace-nowrap">${r.time}</span>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   lucide.createIcons();
 }
@@ -479,9 +497,14 @@ async function submitMessReview(e) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ meal, rating, comment })
   });
-  const data = await res.json();
+  await res.json();
 
-  alert("🌟 Thank you! Your food review has been recorded on the live campus ledger.");
+  shadcnToast({
+    title: "Review Submitted",
+    description: `Your ${rating}-star feedback for ${meal} has been recorded on the live campus ledger.`,
+    variant: "success"
+  });
+
   document.getElementById('review-comment').value = '';
   loadMessMenu(currentDay);
 }
@@ -490,39 +513,44 @@ async function submitMessReview(e) {
 function renderFeesLedger() {
   if (!feeData) return;
 
-  document.getElementById('fee-header-due').innerText = `₹${feeData.pendingAmount.toLocaleString()}`;
+  const headerDue = document.getElementById('fee-header-due');
+  if (headerDue) headerDue.innerText = `₹${feeData.pendingAmount.toLocaleString()}`;
 
   const tbody = document.getElementById('fee-table-body');
-  tbody.innerHTML = feeData.breakdown.map(item => `
-    <tr class="hover:bg-slate-800/30 transition">
-      <td class="py-3 px-4 font-semibold text-white">${item.head}</td>
-      <td class="py-3 px-4 font-mono font-bold text-slate-200">₹${item.amount.toLocaleString()}</td>
-      <td class="py-3 px-4">
-        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-          item.status === 'Paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
-        }">${item.status}</span>
-      </td>
-      <td class="py-3 px-4 text-slate-400">${item.paidOn}</td>
-      <td class="py-3 px-4 font-mono text-[11px] text-indigo-400">${item.txId}</td>
-    </tr>
-  `).join('');
+  if (tbody) {
+    tbody.innerHTML = feeData.breakdown.map(item => `
+      <tr class="hover:bg-muted/40 transition-colors">
+        <td class="py-3 px-4 font-medium text-foreground">${item.head}</td>
+        <td class="py-3 px-4 font-mono font-semibold text-foreground">₹${item.amount.toLocaleString()}</td>
+        <td class="py-3 px-4">
+          <span class="badge-shadcn ${
+            item.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+          }">${item.status}</span>
+        </td>
+        <td class="py-3 px-4 text-muted-foreground font-mono text-xs">${item.paidOn}</td>
+        <td class="py-3 px-4 font-mono text-[11px] text-muted-foreground">${item.txId}</td>
+      </tr>
+    `).join('');
+  }
 
   const receiptsBox = document.getElementById('receipts-cards-container');
-  receiptsBox.innerHTML = feeData.receipts.map(rec => `
-    <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex items-center justify-between">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold text-emerald-400">${rec.receiptNo}</span>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 font-bold">PAID</span>
+  if (receiptsBox) {
+    receiptsBox.innerHTML = feeData.receipts.map(rec => `
+      <div class="p-4 rounded-lg bg-muted/30 border border-border flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-semibold text-foreground">${rec.receiptNo}</span>
+            <span class="badge-shadcn bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[9px]">PAID</span>
+          </div>
+          <h4 class="text-xs font-semibold text-foreground mt-1">₹${rec.amountPaid.toLocaleString()} — ${rec.itemsCovered}</h4>
+          <p class="text-[11px] text-muted-foreground font-mono mt-0.5">${rec.date} • via ${rec.mode}</p>
         </div>
-        <h4 class="text-sm font-bold text-white mt-1">₹${rec.amountPaid.toLocaleString()} — ${rec.itemsCovered}</h4>
-        <p class="text-[11px] text-slate-400 mt-0.5">${rec.date} • via ${rec.mode}</p>
+        <button onclick='viewReceiptModal(${JSON.stringify(rec)})' class="btn-shadcn-secondary text-xs">
+          View Receipt
+        </button>
       </div>
-      <button onclick='viewReceiptModal(${JSON.stringify(rec)})' class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-        View e-Receipt
-      </button>
-    </div>
-  `).join('');
+    `).join('');
+  }
 }
 
 function openPaymentModal() {
@@ -534,9 +562,15 @@ function closePaymentModal() {
 }
 
 function selectPayMode(mode) {
-  document.querySelectorAll('.paymode-btn').forEach(btn => btn.classList.remove('active', 'border-indigo-500', 'bg-indigo-600/20'));
+  document.querySelectorAll('.paymode-btn').forEach(btn => {
+    btn.classList.remove('active', 'border-primary', 'bg-secondary', 'text-foreground');
+    btn.classList.add('border-border', 'bg-card', 'text-muted-foreground');
+  });
   const active = document.getElementById(`paymode-${mode}`);
-  if (active) active.classList.add('active', 'border-indigo-500', 'bg-indigo-600/20');
+  if (active) {
+    active.classList.add('active', 'border-primary', 'bg-secondary', 'text-foreground');
+    active.classList.remove('border-border', 'bg-card', 'text-muted-foreground');
+  }
 }
 
 async function processFinalPayment() {
@@ -551,7 +585,7 @@ async function processFinalPayment() {
   });
   const data = await res.json();
 
-  // Trigger celebration confetti
+  // Celebration confetti
   confetti({
     particleCount: 100,
     spread: 70,
@@ -565,50 +599,59 @@ async function processFinalPayment() {
   btn.innerText = "Confirm & Pay ₹14,500";
   btn.disabled = false;
 
+  shadcnToast({
+    title: "Payment Successful",
+    description: "₹14,500 transaction cleared. Official university e-receipt generated.",
+    variant: "success",
+    duration: 5000
+  });
+
   viewReceiptModal(data.receipt);
 }
 
 function viewReceiptModal(rec) {
   const content = document.getElementById('receipt-modal-content');
+  if (!content) return;
+
   content.innerHTML = `
-    <div class="flex items-center justify-between pb-3 border-b">
+    <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
       <div>
-        <p class="text-[10px] text-slate-500 uppercase font-bold">Receipt Reference</p>
-        <p class="font-mono font-bold text-sm text-indigo-900">${rec.receiptNo}</p>
+        <p class="text-[10px] text-zinc-500 uppercase font-semibold">Receipt Reference</p>
+        <p class="font-mono font-bold text-sm text-zinc-900">${rec.receiptNo}</p>
       </div>
       <div class="text-right">
-        <p class="text-[10px] text-slate-500 uppercase font-bold">Transaction Date</p>
-        <p class="font-medium text-xs text-slate-700">${rec.date}</p>
+        <p class="text-[10px] text-zinc-500 uppercase font-semibold">Transaction Date</p>
+        <p class="font-mono text-xs text-zinc-700">${rec.date}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3 py-2">
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase">Student Name</p>
-        <p class="font-bold text-slate-900">${rec.studentName || 'Aryan Sharma'}</p>
-        <p class="text-[11px] text-slate-600">Roll No: ${rec.rollNo || '23BCSE1042'}</p>
+        <p class="text-[10px] text-zinc-500 font-semibold uppercase">Student Name</p>
+        <p class="font-bold text-zinc-900">${rec.studentName || 'Aryan Sharma'}</p>
+        <p class="text-[11px] text-zinc-600 font-mono">Roll: ${rec.rollNo || '23BCSE1042'}</p>
       </div>
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase">Payment Gateway Ref</p>
-        <p class="font-mono text-[11px] text-indigo-700 font-bold">${rec.txRef}</p>
-        <p class="text-[11px] text-slate-600">Mode: ${rec.mode}</p>
+        <p class="text-[10px] text-zinc-500 font-semibold uppercase">Gateway Ref</p>
+        <p class="font-mono text-[11px] text-zinc-800 font-bold">${rec.txRef}</p>
+        <p class="text-[11px] text-zinc-600">Mode: ${rec.mode}</p>
       </div>
     </div>
 
-    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
+    <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200 mt-2">
       <div class="flex justify-between items-center text-xs">
-        <span class="font-bold text-slate-700">Fee Particulars: ${rec.itemsCovered}</span>
-        <span class="font-mono font-extrabold text-base text-emerald-700">₹${rec.amountPaid.toLocaleString()}</span>
+        <span class="font-medium text-zinc-700">${rec.itemsCovered}</span>
+        <span class="font-mono font-bold text-sm text-emerald-700">₹${rec.amountPaid.toLocaleString()}</span>
       </div>
     </div>
 
     <div class="flex items-center justify-between pt-2">
-      <div class="w-16 h-16 bg-slate-100 p-1 rounded border flex items-center justify-center font-mono text-[8px] text-center text-slate-400">
-        [QR CODE STAMP]
+      <div class="w-14 h-14 bg-zinc-100 p-1 rounded border flex items-center justify-center font-mono text-[8px] text-center text-zinc-400">
+        [SEAL / QR]
       </div>
       <div class="text-right">
-        <div class="text-indigo-900 font-serif italic font-bold">Authorized Registrar</div>
-        <p class="text-[9px] text-slate-400">Computer Generated Sealed Document</p>
+        <div class="text-zinc-900 font-serif italic font-bold text-sm">Authorized Registrar</div>
+        <p class="text-[9px] text-zinc-400">Digitally Verified & Sealed</p>
       </div>
     </div>
   `;
@@ -647,25 +690,26 @@ function sendQuickPrompt(promptText) {
 
 function appendChatMessage(text, sender, actionCard = null) {
   const container = document.getElementById('chat-messages-container');
+  if (!container) return;
 
   const div = document.createElement('div');
-  div.className = sender === 'user' ? 'flex items-start justify-end gap-3' : 'flex items-start gap-3';
+  div.className = sender === 'user' ? 'flex items-start justify-end gap-2.5' : 'flex items-start gap-2.5';
 
   if (sender === 'user') {
     div.innerHTML = `
-      <div class="bg-indigo-600 text-white rounded-2xl p-3.5 max-w-md text-xs font-medium shadow-md">
+      <div class="bg-primary text-primary-foreground rounded-lg px-3.5 py-2.5 max-w-md text-xs font-medium shadow-sm">
         ${text}
       </div>
-      <div class="w-8 h-8 rounded-xl bg-slate-800 text-slate-200 flex items-center justify-center shrink-0 border border-slate-700">
-        <i data-lucide="user" class="w-4 h-4"></i>
+      <div class="w-7 h-7 rounded-md bg-secondary text-secondary-foreground flex items-center justify-center shrink-0 border border-border">
+        <i data-lucide="user" class="w-3.5 h-3.5"></i>
       </div>
     `;
   } else {
     let actionBtnHtml = '';
     if (actionCard) {
       actionBtnHtml = `
-        <div class="pt-2">
-          <button onclick="switchTab('${actionCard.tab}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-bold border border-indigo-500/40 flex items-center gap-1.5 transition">
+        <div class="pt-1.5">
+          <button onclick="switchTab('${actionCard.tab}')" class="btn-shadcn-secondary text-xs py-1 px-2.5 h-auto">
             <span>${actionCard.label}</span>
             <i data-lucide="arrow-right" class="w-3 h-3"></i>
           </button>
@@ -674,11 +718,11 @@ function appendChatMessage(text, sender, actionCard = null) {
     }
 
     div.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/30">
-        <i data-lucide="bot" class="w-4 h-4"></i>
+      <div class="w-7 h-7 rounded-md bg-secondary text-secondary-foreground flex items-center justify-center shrink-0 border border-border">
+        <i data-lucide="bot" class="w-3.5 h-3.5"></i>
       </div>
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 max-w-xl text-xs space-y-2">
-        <p class="text-slate-200 leading-relaxed">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+      <div class="bg-muted/40 border border-border rounded-lg p-3.5 max-w-xl text-xs space-y-2 text-foreground">
+        <p class="leading-relaxed">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
         ${actionBtnHtml}
       </div>
     `;
@@ -707,6 +751,46 @@ async function dispatchSOS(type) {
   const data = await res.json();
 
   closeSOSModal();
-  alert(`🚨 EMERGENCY ALERT DISPATCHED!\n\nReference: ${data.alertId}\nStatus: Campus QRT & Ambulance en route to Mandovi Hostel B-312.\nEstimated Arrival: ${data.responseTimeEstimate}.\nHostel Warden & Security Control notified.`);
+
+  shadcnToast({
+    title: "🚨 EMERGENCY SOS DISPATCHED",
+    description: `Ref: ${data.alertId} • Campus QRT & Ambulance dispatched to Mandovi B-312 (~${data.responseTimeEstimate}).`,
+    variant: "destructive",
+    duration: 8000
+  });
 }
 
+// 12. shadcn/ui Toast Notification Engine
+function shadcnToast({ title, description = '', variant = 'default', duration = 4000 }) {
+  const toaster = document.getElementById('shadcn-toaster');
+  if (!toaster) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'shadcn-toast';
+
+  let icon = '<i data-lucide="info" class="w-4 h-4 text-zinc-300 shrink-0"></i>';
+  if (variant === 'success') {
+    icon = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>';
+  } else if (variant === 'destructive') {
+    icon = '<i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500 shrink-0"></i>';
+  }
+
+  toast.innerHTML = `
+    ${icon}
+    <div class="flex-1 space-y-0.5">
+      <h5 class="text-xs font-semibold text-foreground tracking-tight">${title}</h5>
+      ${description ? `<p class="text-[11px] text-muted-foreground leading-snug">${description}</p>` : ''}
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-muted-foreground hover:text-foreground text-xs ml-1">
+      ✕
+    </button>
+  `;
+
+  toaster.appendChild(toast);
+  lucide.createIcons();
+
+  setTimeout(() => {
+    toast.classList.add('closing');
+    setTimeout(() => toast.remove(), 250);
+  }, duration);
+}
